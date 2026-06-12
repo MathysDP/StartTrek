@@ -44,4 +44,4 @@ additional_rewards: {
     truncation: -200.0,
 }
 
-name: "baseConfig"
+name: "finalConfig"
