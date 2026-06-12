@@ -1,14 +1,12 @@
 # Modules
 import os
-import argparse
-import yaml
-import pandas as pd
+from argparse import ArgumentParser
 
 # Utils
 from src.utils.get_config import get_config
 
-def get_args():
-    parser = argparse.ArgumentParser(description='Evaluate a trained model on the environment.')
+def get_config_path():
+    parser = ArgumentParser(description='Evaluate a trained model on the environment.')
     parser.add_argument('--config', type=str, required=True, help='Path to the evaluation configuration file.')
     args = parser.parse_args()
     return args.config
@@ -26,8 +24,8 @@ def eval_model(eval_path, config_name):
             print(f"Log file {log_file} not found. Skipping analysis for seed {seed}.")
 
 
-eval_path = get_args()
+config_path = get_config_path()
 config = get_config()
 
 config_name = config["name"]
-eval_model(eval_path, config_name)
+eval_model(config_path, config_name)

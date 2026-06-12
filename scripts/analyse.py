@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
 
-def get_log_path():
+def get_args():
     parser = argparse.ArgumentParser(description='Plot training data from a CSV file.')
     parser.add_argument('--type', choices=['train', 'eval'], required=True, help='Type of data to plot (train or eval).')
     parser.add_argument('--filename', type=str, required=True, help='Path to the CSV file containing training data.')
@@ -67,6 +67,7 @@ def plot_evaluation_data(file_path):
         'safe landing': "#30a578",
         'truncation': '#ffd43b',
         'out of viewport': "#861fa3",
+        'sleep': "#1f77b4"
     }
 
     bar_colors = [
@@ -89,7 +90,7 @@ def plot_evaluation_data(file_path):
     plt.tight_layout()
     plt.savefig(file_path.replace('.csv', '.png'))
 
-type, file_path = get_log_path()
+type, file_path = get_args()
 
 if type == 'train':
     plot_training_data(file_path)
