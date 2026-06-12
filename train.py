@@ -12,7 +12,6 @@ from get_config import get_config
 # Network
 from DQN_policy import DQN_network
 
-
 config = get_config()
 
 env = gym.make(
@@ -24,6 +23,8 @@ env = gym.make(
     wind_power=config["env"]["wind_power"],
     turbulence_power=config["env"]["turbulence_power"]
 )
+
+random.seed(config["env"]["seed"])
 
 class ReplayBuffer:
     def __init__(self, capacity=100000):
@@ -94,7 +95,7 @@ epsilon = config["epsilon"]["start"]
 epsilon_min = config["epsilon"]["end"]
 
 for episode in range(config["train"]["episodes"]):
-    state, _ = env.reset()
+    state, _ = env.reset(seed=config["env"]["seed"] + episode)
     state = torch.tensor(state, dtype=torch.float32)
 
     total_reward = 0
