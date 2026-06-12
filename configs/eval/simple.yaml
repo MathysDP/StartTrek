@@ -1,0 +1,18 @@
+env:
+  name: "LunarLander-v3"
+  continuous: false
+  gravity: -10.0
+  enable_wind: false
+  wind_power: 15.0
+  turbulence_power: 1.5
+  seed: 42
+
+eval:
+  episodes: 50
+
+policy:
+  type: "DQN"
+  save_path: "dqn_lunarlander.pth"
+  hidden_sizes: [128, 256, 128]
+  video_folder: "lunarlander-agent"
+  video_prefix: "dqn"

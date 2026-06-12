@@ -1,0 +1,32 @@
+env:
+  name: "LunarLander-v3"
+  continuous: false
+  gravity: -10.0
+  enable_wind: false
+  wind_power: 15.0
+  turbulence_power: 1.5
+  seed: 42
+
+train:
+  episodes: 1000
+  max_steps: 1000
+  learning_rate: 0.001
+
+network:
+  hidden_sizes: [128, 256, 128]
+
+epsilon:
+  start: 1.0
+  end: 0.05
+  decay_steps: 1000
+
+replay_buffer:
+  capacity: 10000
+  batch_size: 64
+
+target_update:
+  frequency: 10
+
+gamma: 0.99
+
+save_path: "dqn_lunarlander.pth"
