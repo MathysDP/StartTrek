@@ -1,4 +1,4 @@
-# analyse_policy.py
+# analyse.py
 
 ## Purpose
 
@@ -7,8 +7,8 @@ Generates diagnostic plots from training or evaluation CSV logs and saves PNG fi
 ## Usage
 
 ```bash
-	python3 scripts/analyse_policy.py --type train --filename outputs/logs/baseConfig_log.csv
-	python3 scripts/analyse_policy.py --type eval --filename outputs/logs/baseConfig_eval_log.csv
+	python -m scripts.analyse --type train --filename outputs/logs/baseConfig_log.csv
+	python -m scripts.analyse --type eval --filename outputs/logs/baseConfig_eval_log0.csv
 ```
 
 ## CLI parsing
@@ -41,6 +41,7 @@ Generates diagnostic plots from training or evaluation CSV logs and saves PNG fi
 	<span style="padding:px;background-color:#30a578"> - safe landing</span>
 	<span style="padding:px;background-color:#ffd43b"> - truncation</span>
 	<span style="padding:px;background-color:#861fa3"> - out of viewport</span>
+  - Any other cause (for example "sleep") is colored white.
 
 ## Outputs
 
@@ -48,7 +49,7 @@ Generates diagnostic plots from training or evaluation CSV logs and saves PNG fi
 
 ## Expected columns
 
-- Train: episode, reward, epsilon, loss, steps
+- Train: episode, reward, epsilon, loss, steps (extra columns are ignored)
 - Eval: episode, rewards, steps, termination_cause
 
 ## Notes

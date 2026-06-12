@@ -78,19 +78,19 @@ Trains a DQN agent on LunarLander using a YAML config passed via --config.
 ## Training loop
 
 For each episode:
-1. Reset env with seed + episode.
+1. Start from the current state (env.reset(seed=config["env"]["seed"]) before the loop; env.reset() after each episode).
 2. Step loop up to train.max_steps:
    - Compute epsilon and select action.
    - Step env and get next_state, reward, terminated, truncated.
    - Optional extra rewards and reward clipping.
    - Store transition in replay buffer.
    - Run train_step and update state.
-   - Track total_reward and steps.
-   - If done, set termination cause and break.
+  - Track total_reward (modified reward) and steps.
+  - If done, set termination cause (safe landing, crash, out of viewport, sleep, truncation) and break.
 3. Update target_net:
    - hard: copy every target_update.frequency episodes
    - soft: tau blending each episode
-4. Append stats to data list.
+4. Append stats (including termination_cause) to data list.
 
 ## Outputs
 
@@ -99,5 +99,5 @@ For each episode:
 
 ## Notes
 
-- total_reward uses the raw reward (not the clipped reward).
+- total_reward uses the modified reward (after optional extra rewards and clipping).
 - The script runs on import; use it as a script with --config.

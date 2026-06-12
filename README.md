@@ -33,18 +33,18 @@ To install all the python dependencies, we recommend you to :
 
 - For evaluation :
 ```bash
-    $> python -m scripts.eval --config configs/simpleEval.yaml
+    $> python -m scripts.eval --config configs/eval/simpleEval.yaml
 ```
 - For graphics analytics :
 ```bash
-    $> python3 scripts/analyse_policy.py --type train --filename outputs/logs/baseConfig_log.csv
+    $> python -m scripts.analyse --type train --filename outputs/logs/baseConfig_log.csv
 ```
 or
 ```bash
-    $> python3 scripts/analyse_policy.py --type eval --filename outputs/logs/baseConfig_eval_log.csv
+    $> python -m scripts.analyse --type eval --filename outputs/logs/baseConfig_eval_log0.csv
 ```
 
-All theses commands will generate outputs in the outputs/logs directory.
+Outputs are written to outputs/logs and outputs/videos. Analysis PNGs are saved next to the CSV logs.
 See more details on the docs directory.
 
 ## Contributors
