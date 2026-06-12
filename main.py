@@ -19,16 +19,16 @@ best_episode = tuple()
 for episode in range(nb_episodes):
 	obs, info = env.reset(seed=SEED + episode)
 	episode_over = False
-	reward = 0
+	rewards = 0
 	while not episode_over:
 		action = policy(obs, env)
-		obs, r, terminated, truncated, info = env.step(action)
-		reward += r
+		obs, reward, terminated, truncated, info = env.step(action)
+		rewards += reward
 		if terminated or truncated:
-			if best_episode == () or reward > best_episode[1]:
-				best_episode = (episode, reward)
-			print(f"Episode {episode} : reward {reward}")
-			mean += reward
+			if best_episode == () or rewards > best_episode[1]:
+				best_episode = (episode, rewards)
+			print(f"Episode {episode} : reward {rewards}")
+			mean += rewards
 			episode_over = True
 
 print("\nbest episode:", best_episode[0], float(best_episode[1]))
