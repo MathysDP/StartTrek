@@ -27,10 +27,19 @@ for episode in range(nb_episodes):
 		if terminated or truncated:
 			if best_episode == () or rewards > best_episode[1]:
 				best_episode = (episode, rewards)
-			print(f"Episode {episode} : reward {rewards}")
+			print(f"Episode {episode}: rewards {rewards}")
+			if reward == 100:
+				print("End with a safe landing")
+			elif reward == -100:
+				if obs[0] > 1.0:
+					print("End cause of out of viewport")
+				elif obs[2] == 0.0 and obs[3] == 0.0:
+					print("End cause of sleep")
+				else:
+					print("End with a crash")
 			mean += rewards
 			episode_over = True
 
-print("\nbest episode:", best_episode[0], float(best_episode[1]))
+print("\nBest episode:", best_episode[0], float(best_episode[1]))
 print("Mean reward:", mean / nb_episodes)
 env.close()
