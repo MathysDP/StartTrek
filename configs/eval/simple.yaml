@@ -8,11 +8,13 @@ env:
   seed: 42
 
 eval:
-  episodes: 50
+  episodes: 100
 
 policy:
   type: "DQN"
-  save_path: "dqn_lunarlander.pth"
-  hidden_sizes: [128, 256, 128]
+  save_path: "train1.pth"
+  hidden_sizes: [64, 128, 64]
   video_folder: "lunarlander-agent"
   video_prefix: "dqn"
+
+log_path: "eval_log1.csv"
