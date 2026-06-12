@@ -1,40 +1,23 @@
 # eval_and_analyse.py
 
 ## Purpose
-
-Runs evaluation and generates plots for each eval log, then collects PNGs in outputs/results.
+Runs evaluation and generates plots for the five evaluation logs.
 
 ## Usage
-
 ```bash
-python -m scripts.eval_and_analyse --config configs/eval/simpleEval.yaml
+python -m scripts.eval_and_analyse --config configs/eval/<config_name>.yaml
 ```
 
-## CLI parsing
+## Command-line arguments
+As above, the script takes one required argument:
+- **--config**: required, path to the evaluation YAML config file.
 
-- get_args() parses a required --config argument (path to the eval YAML).
-- get_config() loads the same YAML so the script can read config["name"].
-
-## Flow
-
-1. Create outputs/logs if missing.
-2. Run evaluation with:
-   - python -m scripts.eval --config <eval_path>
-3. Create outputs/results if missing.
-4. For seed in range(5):
-   - Look for outputs/logs/<name>_eval_log<seed>.csv
-   - If found, run:
-     - python -m scripts.analyse --type eval --filename <log_file>
-   - Move the PNG to outputs/results
-   - If missing, print a skip message
-
-## Outputs
-
-- CSV logs: outputs/logs/<name>_eval_log<seed>.csv
-- Analysis PNGs: outputs/results/<name>_eval_log<seed>.png
-- Videos (from eval): outputs/videos
+## Description
+This script combines evaluation and analysis steps.
+It first runs the evaluation using the specified config, which generates five CSV logs in **outputs/logs** with the naming pattern **<config_name>_eval_log<seed>.csv**.
+Then, it looks for these log files and generates PNG plots for each one using the **analyse.py** script.
+The generated PNG files are saved in **outputs/results** with the same base name as the CSV logs.
+For example, if the evaluation with the seed 0 generates five CSV logs in **outputs/logs/** named **<config_name>_eval_log<seed>.csv**, where seed takes the values 0 to 4, the script will generate five corresponding PNG files in **outputs/results/** named **<config_name>_eval_log<seed>.png**.
 
 ## Notes
-
-- The log suffix is 0..4 because the script loops range(5).
-- Evaluation and analysis are executed via os.system, so the active Python environment is used.
+- More precised description of the evaluation and analysis process can be found in the [evaluation guide](eval.md) and the [analysis guide](analyse_policy.md), respectively.
