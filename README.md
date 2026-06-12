@@ -45,6 +45,7 @@ or
 ```
 
 All theses commands will generate outputs in the outputs/logs directory.
+See more details on the docs directory.
 
 ## Contributors
 
