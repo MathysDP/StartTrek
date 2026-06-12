@@ -1,14 +1,29 @@
 import gymnasium as gym
 from gymnasium.wrappers import RecordEpisodeStatistics, RecordVideo
-from heuristic_policy import policy, PREFIX
+import heuristic_policy
+import random_policy
 
 SEED = 42
 nb_episodes=50
-env = gym.make("LunarLander-v3", render_mode="rgb_array")
+
+user_input = None
+
+while user_input not in ["heuristic", "random"]:
+	user_input = input("Choose a policy (heuristic/random): ").strip().lower()
+	if user_input == "heuristic":
+		policy = heuristic_policy.policy
+		prefix = heuristic_policy.PREFIX
+	elif user_input == "random":
+		policy = random_policy.policy
+		prefix = random_policy.PREFIX
+	else:
+		print("Invalid input. Please choose 'heuristic' or 'random'.")
+
+env = gym.make("LunarLander-v3", render_mode="rgb_array", enable_wind=True, wind_power=15.0, turbulence_power=1.5)
 env = RecordVideo(
     env,
     video_folder="lunarlander-agent",
-    name_prefix=PREFIX,
+	name_prefix=prefix,
     episode_trigger=lambda x: True
 )
 
@@ -31,15 +46,16 @@ for episode in range(nb_episodes):
 			if reward == 100:
 				print("End with a safe landing")
 			elif reward == -100:
-				if obs[0] > 1.0:
+				if obs[0] > 1.0 or obs[0] < -1.0 or obs[1] > 1.0 or obs[1] < -1.0:
 					print("End cause of out of viewport")
 				elif obs[2] == 0.0 and obs[3] == 0.0:
 					print("End cause of sleep")
 				else:
 					print("End with a crash")
+			print("Episode had {} steps\n".format(info["episode"]["l"]))
 			mean += rewards
 			episode_over = True
 
-print("\nBest episode:", best_episode[0], float(best_episode[1]))
+print("Best episode:", best_episode[0], float(best_episode[1]))
 print("Mean reward:", mean / nb_episodes)
 env.close()
