@@ -46,7 +46,7 @@ for episode in range(nb_episodes):
 			if reward == 100:
 				print("End with a safe landing")
 			elif reward == -100:
-				if obs[0] > 1.0 or obs[0] < -1.0 or obs[1] > 1.0 or obs[1] < -1.0:
+				if obs[0] > 1.0:
 					print("End cause of out of viewport")
 				elif obs[2] == 0.0 and obs[3] == 0.0:
 					print("End cause of sleep")
