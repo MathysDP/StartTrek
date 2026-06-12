@@ -50,7 +50,7 @@ for seed in range(config["env"]["seed"], config["env"]["seed"] + 5):
 	state, info = env.reset(seed=seed)
 
 	for episode in range(config["eval"]["episodes"]):
-		print(f"Episode {episode + 1} is running...")
+		print(f"Episode {episode + 1} with the seed {seed} is running...")
 		episode_over = False
 		rewards = 0
 		steps = 0
