@@ -1,38 +1,24 @@
 # get_config.py
 
 ## Purpose
-
 Parses a required --config argument and loads a YAML config file.
 
-## Function
-
-- get_config() -> dict
-
-## How it works
-
-1. Build an argparse.ArgumentParser().
-2. Add --config as a required string argument.
-3. parser.parse_args() validates the CLI and produces args.config.
-4. Open the file path and call yaml.safe_load().
-5. Return the resulting dict.
-
 ## Usage
-
 ```python
 from src.utils.get_config import get_config
 
 config = get_config()
 ```
 
-## Inputs
+## Description
+This function uses **ArgumentParser()** from the **argparse** library to parse a required **--config** argument, which should be a path to a YAML file.
+If the **--config** argument is missing, **argparse** will automatically print an error message and exit the program.
+If the argument is provided, it opens the specified file path and loads the YAML content using **safe_load()** from the **yaml** library.
+Finally, it returns the resulting dictionary containing the configuration parameters.
 
-- --config: path to YAML config file (required)
+This function checks so that the user provides a config file and that the file is a valid YAML file. If any of these conditions are not met, it will raise an error.
 
-## Outputs
-
-- Returns a Python dict from yaml.safe_load().
-
-## Notes
-
-- Missing --config triggers an argparse error and exits.
-- Invalid paths or invalid YAML will raise an exception at load time.
+## Used in
+- scripts/train.py
+- scripts/eval.py
+- scripts/eval_and_analyse.py
