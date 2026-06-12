@@ -46,18 +46,20 @@ best_episode = tuple()
 successful_episodes = 0
 
 data = []
+state, info = env.reset(seed=config["env"]["seed"])
 
 for episode in range(config["eval"]["episodes"]):
 	print(f"Episode {episode + 1} is running...")
-	state, info = env.reset(seed=config["env"]["seed"] + episode)
 	episode_over = False
 	rewards = 0
+	steps = 0
 	cause_of_termination = "unknown"
 
 	while True:
 		action = policy(state, env)
 		state, reward, terminated, truncated, info = env.step(action)
 		rewards += reward
+		steps += 1
 		done = terminated or truncated
 
 		if done:
@@ -72,16 +74,16 @@ for episode in range(config["eval"]["episodes"]):
 					cause_of_termination = "crash"
 			elif truncated:
 				cause_of_termination = "truncation"
+			state, info = env.reset()
 			break
 
 	data.append({
 		"episode": episode,
 		"rewards": rewards,
-		"steps": info["episode"]["l"],
+		"steps": steps,
 		"termination_cause": cause_of_termination
 	})
 
 env.close()
 
 pd.DataFrame(data).to_csv("outputs/logs/" + config["name"] + "_eval_log.csv", index=False)
-

@@ -107,14 +107,13 @@ epsilon_decay = config["epsilon"]["decay_steps"]
 epsilon = epsilon_start
 
 steps_done = 0
-
 data = []
-
 total_episodes = config["train"]["episodes"]
+
+state, _ = env.reset(seed=config["env"]["seed"])
 
 for episode in range(total_episodes):
     print(f"Episode {episode + 1} is running...")
-    state, _ = env.reset(seed=config["env"]["seed"] + episode)
     state = torch.tensor(state, dtype=torch.float32)
 
     total_reward = 0
@@ -163,6 +162,7 @@ for episode in range(total_episodes):
                         cause_of_termination = "crash"
             elif truncated:
                 cause_of_termination = "truncation"
+            state, _ = env.reset()
             break
 
     if config["target_update"]["type"] == "hard":
