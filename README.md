@@ -4,7 +4,7 @@
 
 The Star Trek project aim is to design and train a **Reinforcement Learning** agent to land a lunar module in a 2D simulation. To accomplish this task we choose to make a deep Q-network (DQN) algorithm.
 
-## How to setup the project
+## How to setup the project
 
 ### Prerequisites
 
