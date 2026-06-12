@@ -8,7 +8,7 @@ env:
   seed: 42
 
 train:
-  episodes: 1
+  episodes: 2200
   max_steps: 1000
   learning_rate: 0.001
 
