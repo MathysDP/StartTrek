@@ -17,25 +17,21 @@ def plot_training_data(file_path):
 
     fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 
-    # Plot Reward
     axs[0, 0].plot(df['episode'], df['reward'])
     axs[0, 0].set_title('Reward per Episode')
     axs[0, 0].set_xlabel('Episode')
     axs[0, 0].set_ylabel('Reward')
 
-    # Plot Epsilon
     axs[0, 1].plot(df['episode'], df['epsilon'])
     axs[0, 1].set_title('Epsilon Decay')
     axs[0, 1].set_xlabel('Episode')
     axs[0, 1].set_ylabel('Epsilon')
 
-    # Plot Loss
     axs[1, 0].plot(df['episode'], df['loss'])
     axs[1, 0].set_title('Loss per Episode')
     axs[1, 0].set_xlabel('Episode')
     axs[1, 0].set_ylabel('Loss')
 
-    # Plot Steps
     axs[1, 1].plot(df['episode'], df['steps'])
     axs[1, 1].set_title('Steps per Episode')
     axs[1, 1].set_xlabel('Episode')
@@ -52,9 +48,12 @@ def plot_evaluation_data(file_path):
     fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 
     axs[0, 0].plot(df['episode'], df['rewards'])
+    mean_reward = df['rewards'].mean()
+    axs[0, 0].axhline(mean_reward, color='#f78152', linestyle='--', label=f'Mean = {mean_reward:.2f}')
     axs[0, 0].set_title('Rewards per Episode')
     axs[0, 0].set_xlabel('Episode')
     axs[0, 0].set_ylabel('Rewards')
+    axs[0, 0].legend()
 
     axs[0, 1].plot(df['episode'], df['steps'])
     axs[0, 1].set_title('Steps per Episode')
