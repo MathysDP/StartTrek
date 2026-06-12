@@ -3,10 +3,12 @@ import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import numpy as np
 
 # Utils
 import random
 from collections import deque
+from math import exp
 from get_config import get_config
 
 # Network
@@ -24,7 +26,14 @@ env = gym.make(
     turbulence_power=config["env"]["turbulence_power"]
 )
 
-random.seed(config["env"]["seed"])
+seed = config["env"]["seed"]
+random.seed(seed)
+np.random.seed(seed)
+env.action_space.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
 class ReplayBuffer:
     def __init__(self, capacity=100000):
@@ -91,19 +100,28 @@ def train_step(batch_size, gamma):
 
     return loss.item()
 
-epsilon = config["epsilon"]["start"]
-epsilon_min = config["epsilon"]["end"]
+epsilon_start = config["epsilon"]["start"]
+epsilon_end = config["epsilon"]["end"]
+epsilon_decay = config["epsilon"]["decay_steps"]
+epsilon = epsilon_start
+
+steps_done = 0
 
 for episode in range(config["train"]["episodes"]):
     state, _ = env.reset(seed=config["env"]["seed"] + episode)
     state = torch.tensor(state, dtype=torch.float32)
 
     total_reward = 0
+    total_steps = 0
+    cause_of_termination = ""
 
-    for t in range(config["train"]["max_steps"]):
+    for step in range(config["train"]["max_steps"]):
+        epsilon = epsilon_end + (epsilon_start - epsilon_end) * exp(-1. * steps_done / epsilon_decay)
         action = select_action(state, epsilon)
 
         next_state, reward, terminated, truncated, _ = env.step(action)
+        if config["reward_clipping"]["enabled"]:
+            reward = max(config["reward_clipping"]["min"], min(config["reward_clipping"]["max"], reward))
         done = terminated or truncated
 
         next_state = torch.tensor(next_state, dtype=torch.float32)
@@ -114,20 +132,38 @@ for episode in range(config["train"]["episodes"]):
 
         state = next_state
         total_reward += reward
+        steps_done += 1
+        total_steps += 1
 
         if done:
+            if terminated:
+                if reward == 100:
+                    cause_of_termination = "safe landing"
+                elif reward == -100:
+                    if state[0] > 1.0:
+                        cause_of_termination = "out of viewport"
+                    elif state[2] == 0.0 and state[3] == 0.0:
+                        cause_of_termination = "sleep"
+                    else:
+                        cause_of_termination = "crash"
+            elif truncated:
+                cause_of_termination = "truncation"
             break
 
-    if episode < 100:
-        epsilon = epsilon
-    elif episode < 300:
-        epsilon = max(epsilon_min, epsilon * 0.998)
-    else:
-        epsilon = max(epsilon_min, epsilon * 0.995)
+    if config["target_update"]["type"] == "hard":
+        if episode % config["target_update"]["frequency"] == 0:
+            target_net.load_state_dict(policy_net.state_dict())
+    elif config["target_update"]["type"] == "soft":
+        tau = config["target_update"]["tau"]
+        for target_param, param in zip(target_net.parameters(), policy_net.parameters()):
+            target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
 
-    if episode % config["target_update"]["frequency"] == 0:
-        target_net.load_state_dict(policy_net.state_dict())
-
-    print(f"Episode {episode} | Reward: {total_reward:.2f} | Epsilon: {epsilon:.3f}")
+    loss_display = loss if loss is not None else 0
+    print(f"Episode {episode} | "
+          f"Reward: {total_reward:.2f} | "
+          f"Epsilon: {epsilon:.3f} | "
+          f"Loss: {loss_display:.2f} | "
+          f"Steps: {total_steps} | "
+          f"Cause of Termination: {cause_of_termination}")
 
 torch.save(policy_net.state_dict(), config["save_path"])
