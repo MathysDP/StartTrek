@@ -16,4 +16,4 @@ policy:
   video_folder: "lunarlander-agent"
   video_prefix: "dqn"
 
-name: "baseConfig"
+name: "finalConfig"

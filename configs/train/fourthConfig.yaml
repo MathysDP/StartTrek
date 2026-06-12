@@ -1,0 +1,47 @@
+env:
+  name: "LunarLander-v3"
+  continuous: false
+  gravity: -10.0
+  enable_wind: false
+  wind_power: 15.0
+  turbulence_power: 1.5
+  seed: 42
+
+train:
+  episodes: 2200
+  max_steps: 1000
+  learning_rate: 0.001
+
+network:
+  hidden_sizes: [64, 128, 64]
+
+epsilon:
+  start: 1.0
+  end: 0.05
+  decay_steps: 60000
+
+replay_buffer:
+  capacity: 50000
+  batch_size: 32
+
+target_update: {
+    type: "hard",
+    frequency: 20,
+    tau: 0.005
+}
+
+gamma: 0.99
+
+reward_clipping: {
+    enabled: false,
+    min: -10.0,
+    max: 10.0
+}
+
+additional_rewards: {
+    enabled: true,
+    step: -0.2,
+    truncation: -200.0,
+}
+
+name: "fourthConfig"
