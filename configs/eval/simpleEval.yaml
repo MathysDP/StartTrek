@@ -12,9 +12,8 @@ eval:
 
 policy:
   type: "DQN"
-  save_path: "train1.pth"
   hidden_sizes: [64, 128, 64]
   video_folder: "lunarlander-agent"
   video_prefix: "dqn"
 
-log_path: "eval_log1.csv"
+name: "baseConfig"
