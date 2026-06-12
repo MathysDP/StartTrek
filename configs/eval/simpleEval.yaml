@@ -13,5 +13,7 @@ eval:
 policy:
   type: "DQN"
   hidden_sizes: [64, 128, 64]
+  video_folder: "lunarlander-agent"
+  video_prefix: "dqn"
 
-name: "finalConfig"
+name: "baseConfig"
