@@ -8,12 +8,12 @@ env:
   seed: 42
 
 train:
-  episodes: 2000
+  episodes: 2200
   max_steps: 1000
   learning_rate: 0.001
 
 network:
-  hidden_sizes: [128, 256, 128]
+  hidden_sizes: [64, 128, 64]
 
 epsilon:
   start: 1.0
@@ -21,21 +21,29 @@ epsilon:
   decay_steps: 60000
 
 replay_buffer:
-  capacity: 10000
-  batch_size: 64
+  capacity: 75000
+  batch_size: 32
 
 target_update: {
     type: "hard",
-    frequency: 10,
+    frequency: 20,
     tau: 0.005
 }
 
 gamma: 0.99
 
 reward_clipping: {
-    enabled: true,
-    min: -1.0,
-    max: 1.0
+    enabled: false,
+    min: -10.0,
+    max: 10.0
 }
 
-save_path: "dqn_lunarlander.pth"
+additional_rewards: {
+    enabled: true,
+    step: -0.2,
+    truncation: -200.0,
+}
+
+save_path: "train1.pth"
+
+log_path: "train_log1.csv"
