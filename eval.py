@@ -1,6 +1,7 @@
 # Modules
 import gymnasium as gym
 from gymnasium.wrappers import RecordEpisodeStatistics, RecordVideo
+import pandas as pd
 
 # Policies
 from heuristic_policy import heuristic_policy
@@ -43,36 +44,44 @@ else:
 mean = 0
 best_episode = tuple()
 successful_episodes = 0
+
+data = []
+
 for episode in range(config["eval"]["episodes"]):
+	print(f"Episode {episode + 1} is running...")
 	state, info = env.reset(seed=config["env"]["seed"] + episode)
 	episode_over = False
 	rewards = 0
+	cause_of_termination = "unknown"
 
-	while not episode_over:
+	while True:
 		action = policy(state, env)
 		state, reward, terminated, truncated, info = env.step(action)
 		rewards += reward
-		if terminated or truncated:
-			if best_episode == () or rewards > best_episode[1]:
-				best_episode = (episode, rewards)
-			print(f"Episode {episode}: rewards {rewards}")
+		done = terminated or truncated
+
+		if done:
 			if reward == 100:
-				print("End with a safe landing")
+				cause_of_termination = "safe landing"
 			elif reward == -100:
 				if state[0] > 1.0:
-					print("End cause of out of viewport")
+					cause_of_termination = "out of viewport"
 				elif state[2] == 0.0 and state[3] == 0.0:
-					print("End cause of sleep")
+					cause_of_termination = "sleep"
 				else:
-					print("End with a crash")
+					cause_of_termination = "crash"
 			elif truncated:
-				print("End caused by truncation")
-			print("Episode had {} steps\n".format(info["episode"]["l"]))
-			mean += rewards
-			successful_episodes += 1 if rewards >= 200 else 0
-			episode_over = True
+				cause_of_termination = "truncation"
+			break
 
-print("Best episode:", best_episode[0], float(best_episode[1]))
-print("Mean reward:", mean / config["eval"]["episodes"])
-print("Successful episodes:", successful_episodes)
+	data.append({
+		"episode": episode,
+		"rewards": rewards,
+		"steps": info["episode"]["l"],
+		"termination_cause": cause_of_termination
+	})
+
 env.close()
+
+pd.DataFrame(data).to_csv(config["log_path"], index=False)
+

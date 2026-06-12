@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+import pandas as pd
 
 # Utils
 import random
@@ -107,26 +108,40 @@ epsilon = epsilon_start
 
 steps_done = 0
 
-for episode in range(config["train"]["episodes"]):
+data = []
+
+total_episodes = config["train"]["episodes"]
+
+for episode in range(total_episodes):
+    print(f"Episode {episode + 1} is running...")
     state, _ = env.reset(seed=config["env"]["seed"] + episode)
     state = torch.tensor(state, dtype=torch.float32)
 
     total_reward = 0
     total_steps = 0
-    cause_of_termination = ""
+    cause_of_termination = "unknown"
 
     for step in range(config["train"]["max_steps"]):
         epsilon = epsilon_end + (epsilon_start - epsilon_end) * exp(-1. * steps_done / epsilon_decay)
         action = select_action(state, epsilon)
 
         next_state, reward, terminated, truncated, _ = env.step(action)
+
+        if config["additional_rewards"]["enabled"]:
+            reward += config["additional_rewards"]["step"]
+            if truncated:
+                reward += config["additional_rewards"]["truncation"]
+
         if config["reward_clipping"]["enabled"]:
-            reward = max(config["reward_clipping"]["min"], min(config["reward_clipping"]["max"], reward))
+            reward_clipped = max(config["reward_clipping"]["min"], min(config["reward_clipping"]["max"], reward))
+        else:
+            reward_clipped = reward
+
         done = terminated or truncated
 
         next_state = torch.tensor(next_state, dtype=torch.float32)
 
-        replay_buffer.push(state, action, reward, next_state, done)
+        replay_buffer.push(state, action, reward_clipped, next_state, done)
 
         loss = train_step(batch_size=config["replay_buffer"]["batch_size"], gamma=config["gamma"])
 
@@ -159,11 +174,14 @@ for episode in range(config["train"]["episodes"]):
             target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
 
     loss_display = loss if loss is not None else 0
-    print(f"Episode {episode} | "
-          f"Reward: {total_reward:.2f} | "
-          f"Epsilon: {epsilon:.3f} | "
-          f"Loss: {loss_display:.2f} | "
-          f"Steps: {total_steps} | "
-          f"Cause of Termination: {cause_of_termination}")
+    data.append({
+        "episode": episode,
+        "reward": total_reward,
+        "epsilon": epsilon,
+        "loss": loss_display,
+        "steps": total_steps,
+        "termination_cause": cause_of_termination
+    })
 
+pd.DataFrame(data).to_csv(config["log_path"], index=False)
 torch.save(policy_net.state_dict(), config["save_path"])
