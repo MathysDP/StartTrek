@@ -1,6 +1,6 @@
-import gymnasium as gym
+class random_policy:
+    def __init__(self):
+        pass
 
-PREFIX="random_policy"
-
-def policy(obs, env):
-    return env.action_space.sample()
+    def __call__(self, state, env):
+        return env.action_space.sample()
