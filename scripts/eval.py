@@ -41,49 +41,50 @@ elif config["policy"]["type"] == "DQN":
 else:
 	raise ValueError(f"Unknown policy type: {config['policy']['type']}")
 
-mean = 0
-best_episode = tuple()
-successful_episodes = 0
 
-data = []
-state, info = env.reset(seed=config["env"]["seed"])
+for seed in range(config["env"]["seed"], config["env"]["seed"] + 5):
+	mean = 0
+	best_episode = tuple()
+	successful_episodes = 0
+	data = []
+	state, info = env.reset(seed=seed)
 
-for episode in range(config["eval"]["episodes"]):
-	print(f"Episode {episode + 1} is running...")
-	episode_over = False
-	rewards = 0
-	steps = 0
-	cause_of_termination = "unknown"
+	for episode in range(config["eval"]["episodes"]):
+		print(f"Episode {episode + 1} is running...")
+		episode_over = False
+		rewards = 0
+		steps = 0
+		cause_of_termination = "unknown"
 
-	while True:
-		action = policy(state, env)
-		state, reward, terminated, truncated, info = env.step(action)
-		rewards += reward
-		steps += 1
-		done = terminated or truncated
+		while True:
+			action = policy(state, env)
+			state, reward, terminated, truncated, info = env.step(action)
+			rewards += reward
+			steps += 1
+			done = terminated or truncated
 
-		if done:
-			if reward == 100:
-				cause_of_termination = "safe landing"
-			elif reward == -100:
-				if state[0] > 1.0:
-					cause_of_termination = "out of viewport"
-				elif state[2] == 0.0 and state[3] == 0.0:
-					cause_of_termination = "sleep"
-				else:
-					cause_of_termination = "crash"
-			elif truncated:
-				cause_of_termination = "truncation"
-			state, info = env.reset()
-			break
+			if done:
+				if reward == 100:
+					cause_of_termination = "safe landing"
+				elif reward == -100:
+					if state[0] > 1.0:
+						cause_of_termination = "out of viewport"
+					elif state[2] == 0.0 and state[3] == 0.0:
+						cause_of_termination = "sleep"
+					else:
+						cause_of_termination = "crash"
+				elif truncated:
+					cause_of_termination = "truncation"
+				state, info = env.reset()
+				break
 
-	data.append({
-		"episode": episode,
-		"rewards": rewards,
-		"steps": steps,
-		"termination_cause": cause_of_termination
-	})
+		data.append({
+			"episode": episode,
+			"rewards": rewards,
+			"steps": steps,
+			"termination_cause": cause_of_termination
+		})
 
-env.close()
+	env.close()
 
-pd.DataFrame(data).to_csv("outputs/logs/" + config["name"] + "_eval_log.csv", index=False)
+	pd.DataFrame(data).to_csv("outputs/logs/" + config["name"] + "_eval_log" + str(seed) + ".csv", index=False)

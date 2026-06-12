@@ -125,27 +125,26 @@ for episode in range(total_episodes):
         action = select_action(state, epsilon)
 
         next_state, reward, terminated, truncated, _ = env.step(action)
+        modified_reward = reward
 
         if config["additional_rewards"]["enabled"]:
-            reward += config["additional_rewards"]["step"]
+            modified_reward += config["additional_rewards"]["step"]
             if truncated:
-                reward += config["additional_rewards"]["truncation"]
+                modified_reward += config["additional_rewards"]["truncation"]
 
         if config["reward_clipping"]["enabled"]:
-            reward_clipped = max(config["reward_clipping"]["min"], min(config["reward_clipping"]["max"], reward))
-        else:
-            reward_clipped = reward
+            modified_reward = max(config["reward_clipping"]["min"], min(config["reward_clipping"]["max"], modified_reward))
 
         done = terminated or truncated
 
         next_state = torch.tensor(next_state, dtype=torch.float32)
 
-        replay_buffer.push(state, action, reward_clipped, next_state, done)
+        replay_buffer.push(state, action, modified_reward, next_state, done)
 
         loss = train_step(batch_size=config["replay_buffer"]["batch_size"], gamma=config["gamma"])
 
         state = next_state
-        total_reward += reward
+        total_reward += modified_reward
         steps_done += 1
         total_steps += 1
 
